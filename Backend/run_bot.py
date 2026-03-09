@@ -1,0 +1,50 @@
+"""
+run_bot — entry script for Santosh trading setup.
+"""
+
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+
+CURRENT_DIR = Path(__file__).resolve().parent
+if str(CURRENT_DIR) not in sys.path:
+    sys.path.insert(0, str(CURRENT_DIR))
+
+from modules.strategy.engine import SantoshTradingEngine
+from modules.utils.config_loader import build_paths, load_all_configs
+from modules.utils.logger import setup_logger
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Santosh simple trading bot")
+    parser.add_argument("--once", action="store_true", help="Run one cycle and exit")
+    parser.add_argument("--force-login", action="store_true", help="Force fresh Upstox login")
+    args = parser.parse_args()
+
+    project_root = CURRENT_DIR.parent
+    paths = build_paths(project_root)
+    config_bundle = load_all_configs(paths)
+
+    level = config_bundle["system"].get("runtime", {}).get("logs_level", "INFO")
+    logger = setup_logger("santosh_bot", paths.logs_dir, level=level)
+
+    engine = SantoshTradingEngine(config_bundle=config_bundle, logger=logger)
+    if not engine.initialize(force_login=args.force_login):
+        return 1
+
+    try:
+        if args.once:
+            engine.run_once()
+        else:
+            engine.run_forever()
+    except KeyboardInterrupt:
+        logger.info("Interrupted by user")
+    finally:
+        engine.stop()
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

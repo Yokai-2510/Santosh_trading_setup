@@ -1,0 +1,8 @@
+Backend/source/credentials.json
+Backend/data/cache/access_token.json
+Backend/data/cache/master.json
+Backend/data/cache/master.json.gz
+Backend/data/cache/index_option_universe.json
+Backend/data/logs/
+__pycache__/
+*.pyc

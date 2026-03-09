@@ -1,0 +1,69 @@
+{
+  "_strategy_id": "santosh_simple_index_options",
+  "_doc": "Simple index options strategy. Entry requires enabled conditions to be true. Expiry choice allows only one value at a time: current or next.",
+  "entry_conditions": {
+    "_doc": "Core entry conditions and extra toggles.",
+    "timeframe_minutes": 3,
+    "rsi": {
+      "enabled": true,
+      "period": 14,
+      "operator": ">",
+      "threshold": 60.0
+    },
+    "volume_vs_ema": {
+      "enabled": true,
+      "ema_period": 20
+    },
+    "macd_confirmation": {
+      "_doc": "Additional indicator 1. For bullish setup, requires MACD line above signal and histogram >= min_histogram.",
+      "enabled": false,
+      "fast_period": 12,
+      "slow_period": 26,
+      "signal_period": 9,
+      "min_histogram": 0.0
+    },
+    "adx_strength": {
+      "_doc": "Additional indicator 2. Requires ADX >= threshold to confirm trend strength.",
+      "enabled": false,
+      "period": 14,
+      "threshold": 20.0
+    },
+    "min_candles_required": 60
+  },
+  "instrument_selection": {
+    "_doc": "Single underlying and single expiry choice at a time.",
+    "underlying": "NIFTY",
+    "expiry_choice": "current",
+    "option_type": "CE",
+    "strike_mode": "ATM",
+    "strike_offset": 0,
+    "index_instruments": {
+      "NIFTY": "NSE_INDEX|Nifty 50",
+      "BANKNIFTY": "NSE_INDEX|Nifty Bank"
+    }
+  },
+  "order_details": {
+    "_doc": "One active position at a time. Supports limit/market/sl/sl-m payload fields.",
+    "max_active_positions": 1,
+    "quantity_mode": "lots",
+    "lots": 1,
+    "order_type": "LIMIT",
+    "product": "D",
+    "validity": "DAY",
+    "disclosed_quantity": 0,
+    "trigger_price": 0.0,
+    "is_amo": false,
+    "entry_price_source": "ltp",
+    "tick_size": 0.05,
+    "modify_on_reentry_signal": true,
+    "modify_cooldown_seconds": 10,
+    "only_improve_price": true,
+    "order_status_poll_seconds": 1
+  },
+  "position_management": {
+    "_doc": "Manual exit detection by polling broker positions.",
+    "manual_exit_detection_enabled": true,
+    "manual_exit_poll_interval_seconds": 1,
+    "reentry_wait_seconds_after_close": 30
+  }
+}

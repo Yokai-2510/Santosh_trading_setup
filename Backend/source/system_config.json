@@ -1,0 +1,41 @@
+{
+  "_doc": "System-level configuration for Santosh trading setup.",
+  "broker": {
+    "name": "upstox",
+    "api": {
+      "request_timeout_seconds": 15,
+      "order_request_timeout_seconds": 10,
+      "positions_request_timeout_seconds": 10,
+      "historical_request_timeout_seconds": 20,
+      "master_contract_timeout_seconds": 60
+    }
+  },
+  "auth": {
+    "token_reset_time": "03:30",
+    "token_expiry_buffer_min": 5,
+    "headless": true,
+    "login_timeout_sec": 60,
+    "playwright_args": [
+      "--disable-web-security",
+      "--no-sandbox",
+      "--disable-blink-features=AutomationControlled"
+    ]
+  },
+  "runtime": {
+    "mode": "paper",
+    "loop_interval_seconds": 5,
+    "logs_level": "INFO",
+    "ignore_market_hours": false
+  },
+  "market": {
+    "exchange": "NFO",
+    "market_open": "09:15:00",
+    "market_close": "15:30:00"
+  },
+  "data": {
+    "paths": {
+      "cache": "Backend/data/cache",
+      "logs": "Backend/data/logs"
+    }
+  }
+}
