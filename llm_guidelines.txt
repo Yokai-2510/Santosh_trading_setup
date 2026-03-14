@@ -1,0 +1,243 @@
+
+---
+
+# LLM Python Coding Style & Execution Specification (v3 — Enforced)
+
+## 1. Scope & Authority
+
+This document defines **how the LLM must think, structure, and write Python code** for a project.
+
+It is a **strong default**:
+
+* Follow it unless explicitly overridden
+* If violated, the LLM must stop and propose a compliant alternative
+
+Applies only to **coding projects**.
+
+---
+
+## 2. Pre-Code Alignment Rules (Non-Negotiable)
+
+Before writing **any code**, the LLM must stop and ask questions if:
+
+* Requirements are ambiguous
+* Responsibilities between modules are unclear
+* Control flow or ownership is uncertain
+* The request would force:
+
+  * God functions
+  * Hidden coupling
+  * Implicit side effects
+
+**No “we can adjust later” behavior.**
+Architecture is decided first. Code comes last.
+
+---
+
+## 3. File & Module Structure Rules
+
+### 3.1 Entry File (Main / Bootstrapper)
+
+The entry file is a **linear orchestrator**, nothing more.
+
+**Hard constraints:**
+
+* ❌ No function definitions
+* ❌ No class definitions
+* ❌ No business logic
+* ❌ No conditional orchestration logic
+* ✅ Imports only at the top
+* ✅ Executes top → bottom, sequentially
+
+**Allowed:**
+
+* Calling module entry points
+* Starting threads
+* Registering shutdown handling
+* Keeping the process alive
+
+If logic *feels necessary* in `main`, it belongs in a module.
+
+---
+
+### 3.2 Modules
+
+Each module must:
+
+* Own **one responsibility**
+* Expose **explicit entry-point functions**
+* Be callable from `main` in **one line**
+* Handle its own:
+
+  * Logging
+  * Error handling
+  * Internal sequencing
+
+No side effects at import time.
+
+---
+
+## 4. Function Design & Coding Style (THIS WAS MISSING BEFORE)
+
+### 4.1 Function Granularity (Critical)
+
+**Hard rule:**
+
+> One function = one specific task.
+
+* No multi-page functions
+* No “do everything” functions
+* No nested orchestration inside functions
+
+If a function:
+
+* Has many `if` branches
+* Switches responsibilities
+* Handles setup + execution + cleanup
+
+👉 **It must be split.**
+
+---
+
+### 4.2 Preferred Style
+
+* Prefer **many small, explicit functions**
+* Prefer **single-line calls** in orchestrators
+* Prefer **flat, readable flow** over clever abstractions
+
+Example pattern (GOOD):
+
+```python
+authenticate_user(state)
+build_trading_universe(state)
+start_stream_services(state)
+wait_for_connection(state)
+```
+
+Anti-pattern (FORBIDDEN):
+
+```python
+initialize_everything_and_start_all_services(state)
+```
+
+---
+
+### 4.3 Control Flow Rules
+
+* No deeply nested logic
+* No hidden state mutation
+* No “smart” helper functions that do multiple things
+* Every step should be readable **top-down without context switching**
+
+Code must read like a **checklist**, not a puzzle.
+
+---
+
+## 5. Concurrency & Lifecycle Rules
+
+* Default concurrency model: **threading**
+* Threads must:
+
+  * Be created explicitly
+  * Have clear names
+  * Have a single responsibility
+* Thread targets must be **top-level functions**, not lambdas
+
+The main thread:
+
+* Starts services
+* Logs readiness
+* Idles
+* Handles shutdown
+
+Graceful shutdown logic **must live in a module**, not inline.
+
+---
+
+## 6. Logging, Errors & Comments
+
+### 6.1 Logging
+
+* At least one persistent log file is mandatory
+* Console + file logging allowed
+* Support **multiple tags per log**
+* Timestamp precision: sub-second (reasonable Python limit)
+* Large or noisy logs go to separate files
+
+No:
+
+* Large data dumps
+* Debug spam
+* Emotional or narrative logs
+
+Logs describe **system state only**.
+
+---
+
+### 6.2 Error Handling
+
+* Fail fast, explicitly
+* Never swallow exceptions
+* Custom exceptions allowed **only for realistic failure modes**
+* Wrap exceptions only when clarity improves
+
+---
+
+### 6.3 Comments
+
+* Explain **why**, not **what**
+* Inline `#` comments preferred
+* One concise docstring per public function/module is acceptable
+* No triple-quoted comment blocks for narration
+* Comments must look like they belong in a real production repo
+
+No references to:
+
+* The LLM
+* Conversations
+* “Design decisions we discussed”
+
+---
+
+## 7. Dependencies, Tests & Performance
+
+### 7.1 Dependencies
+
+* Standard library first
+* Third-party libraries allowed **only with justification**
+* No silent dependency additions
+
+---
+
+### 7.2 Tests
+
+* Tests are **suggested**, not auto-written
+* Tests must be written only for:
+
+  * High-risk logic
+  * Financial / state-critical paths
+* No boilerplate test suites
+
+---
+
+### 7.3 Performance
+
+* No premature optimization
+* When relevant, briefly flag performance risks
+* No speculative scaling discussions unless asked
+
+---
+
+## Final Enforcement Summary
+
+If a request would cause:
+
+* God functions
+* Messy orchestration
+* Hidden logic in `main`
+* Over-abstracted helpers
+
+The LLM **must stop**, explain the issue, and propose a cleaner structure.
+
+---
+

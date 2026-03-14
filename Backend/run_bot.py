@@ -1,5 +1,5 @@
 """
-run_bot — entry script for Santosh trading setup.
+run_bot — headless entry point for Santosh trading setup.
 """
 
 from __future__ import annotations
@@ -12,13 +12,14 @@ CURRENT_DIR = Path(__file__).resolve().parent
 if str(CURRENT_DIR) not in sys.path:
     sys.path.insert(0, str(CURRENT_DIR))
 
+from modules.state.runtime_state import StateStore
 from modules.strategy.engine import SantoshTradingEngine
 from modules.utils.config_loader import build_paths, load_all_configs
 from modules.utils.logger import setup_logger
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Santosh simple trading bot")
+    parser = argparse.ArgumentParser(description="Santosh trading bot")
     parser.add_argument("--once", action="store_true", help="Run one cycle and exit")
     parser.add_argument("--force-login", action="store_true", help="Force fresh Upstox login")
     args = parser.parse_args()
@@ -27,10 +28,11 @@ def main() -> int:
     paths = build_paths(project_root)
     config_bundle = load_all_configs(paths)
 
-    level = config_bundle["system"].get("runtime", {}).get("logs_level", "INFO")
+    level = config_bundle["system"].get("runtime", {}).get("log_level", "INFO")
     logger = setup_logger("santosh_bot", paths.logs_dir, level=level)
+    state_store = StateStore()
 
-    engine = SantoshTradingEngine(config_bundle=config_bundle, logger=logger)
+    engine = SantoshTradingEngine(config_bundle=config_bundle, state_store=state_store, logger=logger)
     if not engine.initialize(force_login=args.force_login):
         return 1
 

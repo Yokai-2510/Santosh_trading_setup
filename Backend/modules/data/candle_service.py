@@ -1,14 +1,21 @@
 """
 candle_service — maintains rolling candle cache from Upstox Historical V3.
+
+When a LiveCandleBuilder is attached (via set_live_builder), live WebSocket
+candles are merged on top of the historical REST data so that volume fields
+contain real values for NSE_INDEX instruments.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Dict, List
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 from brokers.upstox.historical_v3 import fetch_historical_candles_v3
+
+if TYPE_CHECKING:
+    from modules.data.live_candle_builder import LiveCandleBuilder
 
 
 @dataclass
@@ -22,6 +29,11 @@ class CandleService:
         self.headers = headers
         self.timeout_seconds = timeout_seconds
         self._cache: Dict[str, CandleCacheItem] = {}
+        self._live_builder: Optional["LiveCandleBuilder"] = None
+
+    def set_live_builder(self, builder: "LiveCandleBuilder") -> None:
+        """Attach a LiveCandleBuilder so live WebSocket volume overlays REST data."""
+        self._live_builder = builder
 
     def bootstrap_one_month(self, instrument_key: str, timeframe_minutes: int) -> List[dict]:
         to_date = datetime.now().date()
@@ -63,10 +75,24 @@ class CandleService:
         return cached.candles
 
     def get_candles(self, instrument_key: str, timeframe_minutes: int) -> List[dict]:
+        """
+        Return candles for the given instrument and timeframe.
+
+        Live WebSocket candles (with real volume) are merged on top of the
+        historical REST baseline whenever the LiveCandleBuilder has data.
+        """
         key = self._cache_key(instrument_key, timeframe_minutes)
         if key not in self._cache:
-            return self.bootstrap_one_month(instrument_key, timeframe_minutes)
-        return self.refresh_recent(instrument_key, timeframe_minutes)
+            historical = self.bootstrap_one_month(instrument_key, timeframe_minutes)
+        else:
+            historical = self.refresh_recent(instrument_key, timeframe_minutes)
+
+        if self._live_builder:
+            live = self._live_builder.get_candles(instrument_key, timeframe_minutes)
+            if live:
+                historical = self._merge_candles(historical, live)
+
+        return historical
 
     @staticmethod
     def _cache_key(instrument_key: str, timeframe_minutes: int) -> str:

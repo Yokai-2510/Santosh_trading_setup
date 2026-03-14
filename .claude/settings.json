@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); print\\(data[0][''''text'''']\\)\")",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/unit/test_exit_conditions.py tests/unit/test_risk_guard.py -v)",
+      "Bash(.venv/Scripts/pip.exe install:*)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/unit/test_technical_indicators.py tests/unit/test_instrument_selection.py -v)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/unit/ -v)",
+      "Bash(.venv/Scripts/python.exe -c \":*)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/unit/ -q)",
+      "Bash(.venv/Scripts/pip.exe list:*)",
+      "Bash(python -c \"import websocket; print\\(''websocket-client ok''\\)\")",
+      "Bash(python -c \"import upstox_client; print\\(''upstox sdk ok''\\)\")",
+      "Bash(python -c \"import google.protobuf; print\\(''protobuf ok''\\)\")",
+      "Bash(pip install:*)",
+      "Bash(python -c \"import websocket; print\\(websocket.__version__\\)\")",
+      "Bash(python -c \"import upstox_client; print\\(''upstox sdk:'', upstox_client.__version__\\)\")",
+      "Bash(python -c \"import upstox_client.feeder; print\\(''feeder ok''\\)\")",
+      "Bash(python -c \":*)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(''''token_found:'''', bool\\(d.get\\(''''access_token''''\\)\\)\\); print\\(''''valid_until:'''', d.get\\(''''valid_until_ist''''\\)\\)\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(''''valid_until:'''', d.get\\(''''valid_until_ist''''\\)\\); print\\(''''has_token:'''', bool\\(d.get\\(''''access_token''''\\)\\)\\)\")"
+    ]
+  }
+}

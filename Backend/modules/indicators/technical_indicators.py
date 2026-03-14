@@ -42,40 +42,25 @@ def evaluate_entry_indicators(candles: List[dict], entry_cfg: Dict[str, Any]) ->
         checks.append(passed)
 
     # Volume > EMA
+    # Note: NSE_INDEX spot instruments return 0 volume — skip check in that case
     vol_cfg = entry_cfg.get("volume_vs_ema", {})
     if vol_cfg.get("enabled", True):
         period = int(vol_cfg.get("ema_period", 20))
         vol_ema = compute_ema(frame["volume"], period)
         current_volume = float(frame["volume"].iloc[-1])
         current_vol_ema = float(vol_ema.iloc[-1])
-        passed = current_volume > current_vol_ema
         result["values"]["volume"] = current_volume
         result["values"]["volume_ema"] = current_vol_ema
-        result["checks"]["volume_vs_ema"] = passed
-        checks.append(passed)
+        if current_vol_ema <= 0:
+            # No volume data (index instrument) — skip, do not penalise entry
+            result["values"]["volume_no_data"] = True
+        else:
+            passed = current_volume > current_vol_ema
+            result["checks"]["volume_vs_ema"] = passed
+            checks.append(passed)
 
-    # Additional indicator 1: MACD
-    macd_cfg = entry_cfg.get("macd_confirmation", {})
-    if macd_cfg.get("enabled", False):
-        macd_df = compute_macd(
-            frame["close"],
-            fast=int(macd_cfg.get("fast_period", 12)),
-            slow=int(macd_cfg.get("slow_period", 26)),
-            signal=int(macd_cfg.get("signal_period", 9)),
-        )
-        macd_line = float(macd_df["macd"].iloc[-1])
-        signal_line = float(macd_df["signal"].iloc[-1])
-        histogram = float(macd_df["histogram"].iloc[-1])
-        min_hist = float(macd_cfg.get("min_histogram", 0.0))
-        passed = macd_line > signal_line and histogram >= min_hist
-        result["values"]["macd"] = macd_line
-        result["values"]["macd_signal"] = signal_line
-        result["values"]["macd_histogram"] = histogram
-        result["checks"]["macd_confirmation"] = passed
-        checks.append(passed)
-
-    # Additional indicator 2: ADX
-    adx_cfg = entry_cfg.get("adx_strength", {})
+    # ADX trend strength
+    adx_cfg = entry_cfg.get("adx", {})
     if adx_cfg.get("enabled", False):
         adx_series = compute_adx(
             high=frame["high"],
@@ -87,7 +72,7 @@ def evaluate_entry_indicators(candles: List[dict], entry_cfg: Dict[str, Any]) ->
         threshold = float(adx_cfg.get("threshold", 20.0))
         passed = current_adx >= threshold
         result["values"]["adx"] = current_adx
-        result["checks"]["adx_strength"] = passed
+        result["checks"]["adx"] = passed
         checks.append(passed)
 
     result["ok"] = all(checks) if checks else False

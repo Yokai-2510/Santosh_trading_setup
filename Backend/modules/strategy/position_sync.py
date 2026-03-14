@@ -26,16 +26,17 @@ def detect_manual_exit(
         return None
 
     positions = get_positions(headers=headers, timeout=timeout_seconds)
+    # API failure returns None — do not treat as exit
     if positions is None:
         return None
 
     matched = [row for row in positions if row.get("instrument_token") == instrument_token]
     if not matched:
-        # No position entry found for our token -> treat as externally closed.
         return manager.mark_manual_exit(exit_price=0.0, reason="MANUAL_DETECTED_NOT_FOUND")
 
     net_quantity = sum(int(row.get("quantity", 0)) for row in matched)
     if net_quantity == 0:
         last_price = float(matched[0].get("last_price", 0.0))
         return manager.mark_manual_exit(exit_price=last_price, reason="MANUAL_DETECTED_QTY_ZERO")
+
     return None

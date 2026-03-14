@@ -1,13 +1,12 @@
 {
-  "_doc": "System-level configuration for Santosh trading setup.",
   "broker": {
     "name": "upstox",
-    "api": {
-      "request_timeout_seconds": 15,
-      "order_request_timeout_seconds": 10,
-      "positions_request_timeout_seconds": 10,
-      "historical_request_timeout_seconds": 20,
-      "master_contract_timeout_seconds": 60
+    "api_timeouts": {
+      "request_seconds": 15,
+      "order_seconds": 10,
+      "positions_seconds": 10,
+      "historical_seconds": 20,
+      "master_contract_seconds": 60
     }
   },
   "auth": {
@@ -24,13 +23,18 @@
   "runtime": {
     "mode": "paper",
     "loop_interval_seconds": 5,
-    "logs_level": "INFO",
+    "log_level": "INFO",
     "ignore_market_hours": false
   },
   "market": {
     "exchange": "NFO",
-    "market_open": "09:15:00",
-    "market_close": "15:30:00"
+    "open": "09:15:00",
+    "close": "15:30:00"
+  },
+  "risk": {
+    "enabled": false,
+    "max_daily_loss": 5000.0,
+    "max_trades_per_session": 10
   },
   "data": {
     "paths": {

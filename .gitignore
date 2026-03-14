@@ -6,3 +6,7 @@ Backend/data/cache/index_option_universe.json
 Backend/data/logs/
 __pycache__/
 *.pyc
+.venv/
+__pycache__/
+.vscode/
+*.pyc

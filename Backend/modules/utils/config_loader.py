@@ -84,43 +84,63 @@ def load_all_configs(paths: ConfigPaths) -> Dict[str, Any]:
     }
 
 
-def validate_strategy_config(strategy_cfg: Dict[str, Any]) -> None:
-    entry = strategy_cfg.setdefault("entry_conditions", {})
+def validate_strategy_config(cfg: Dict[str, Any]) -> None:
+    # Entry conditions
+    entry = cfg.setdefault("entry_conditions", {})
     timeframe = int(entry.get("timeframe_minutes", 3))
     if timeframe not in (2, 3, 5):
         entry["timeframe_minutes"] = 3
+    entry.setdefault("rsi", {})
+    entry.setdefault("volume_vs_ema", {})
+    entry.setdefault("macd", {})
+    entry.setdefault("adx", {})
 
-    instrument = strategy_cfg.setdefault("instrument_selection", {})
-    underlying = str(instrument.get("underlying", "NIFTY")).upper()
-    if underlying not in {"NIFTY", "BANKNIFTY"}:
-        instrument["underlying"] = "NIFTY"
-
-    expiry_choice = str(instrument.get("expiry_choice", "current")).lower()
-    if expiry_choice not in {"current", "next"}:
-        instrument["expiry_choice"] = "current"
+    # Instrument selection
+    ins = cfg.setdefault("instrument_selection", {})
+    if str(ins.get("underlying", "NIFTY")).upper() not in {"NIFTY", "BANKNIFTY"}:
+        ins["underlying"] = "NIFTY"
     else:
-        instrument["expiry_choice"] = expiry_choice
+        ins["underlying"] = str(ins.get("underlying", "NIFTY")).upper()
+    expiry = str(ins.get("expiry_choice", "current")).lower()
+    ins["expiry_choice"] = expiry if expiry in {"current", "next"} else "current"
+    strike_mode = str(ins.get("strike_mode", "ATM")).upper()
+    ins["strike_mode"] = strike_mode if strike_mode in {"ATM", "ITM", "OTM"} else "ATM"
+    option_type = str(ins.get("option_type", "CE")).upper()
+    ins["option_type"] = option_type if option_type in {"CE", "PE"} else "CE"
 
-    strike_mode = str(instrument.get("strike_mode", "ATM")).upper()
-    if strike_mode not in {"ATM", "ITM", "OTM"}:
-        instrument["strike_mode"] = "ATM"
+    # Order execution
+    cfg.setdefault("order_execution", {})
 
-    option_type = str(instrument.get("option_type", "CE")).upper()
-    if option_type not in {"CE", "PE"}:
-        instrument["option_type"] = "CE"
+    # Exit conditions
+    exits = cfg.setdefault("exit_conditions", {})
+    exits.setdefault("stoploss", {"enabled": True, "type": "percent", "value": 30.0, "order_type": "SL-M"})
+    exits.setdefault("target", {"enabled": False})
+    exits.setdefault("trailing_sl", {"enabled": False})
+    exits.setdefault("time_based_exit", {"enabled": False})
 
-    order = strategy_cfg.setdefault("order_details", {})
-    order["max_active_positions"] = 1
+    # Order modify
+    cfg.setdefault("order_modify", {})
+
+    # Position management
+    cfg.setdefault("position_management", {})
 
 
-def validate_system_config(system_cfg: Dict[str, Any]) -> None:
-    runtime = system_cfg.setdefault("runtime", {})
+def validate_system_config(cfg: Dict[str, Any]) -> None:
+    runtime = cfg.setdefault("runtime", {})
     mode = str(runtime.get("mode", "paper")).lower()
     runtime["mode"] = "live" if mode == "live" else "paper"
-
     runtime.setdefault("loop_interval_seconds", 5)
-    runtime.setdefault("logs_level", "INFO")
+    runtime.setdefault("log_level", "INFO")
 
-    auth_cfg = system_cfg.setdefault("auth", {})
-    auth_cfg.setdefault("token_reset_time", "03:30")
-    auth_cfg.setdefault("token_expiry_buffer_min", 5)
+    cfg.setdefault("auth", {})
+    cfg["auth"].setdefault("token_reset_time", "03:30")
+    cfg["auth"].setdefault("token_expiry_buffer_min", 5)
+
+    cfg.setdefault("market", {})
+    cfg["market"].setdefault("open", "09:15:00")
+    cfg["market"].setdefault("close", "15:30:00")
+
+    cfg.setdefault("risk", {"enabled": False})
+
+    cfg.setdefault("broker", {})
+    cfg["broker"].setdefault("api_timeouts", {})
