@@ -20,10 +20,10 @@ _GREEN = "#22c55e"
 
 
 class SystemView(ctk.CTkScrollableFrame):
-    def __init__(self, parent, source_dir: Path, **kwargs) -> None:
+    def __init__(self, parent, configs_dir: Path, **kwargs) -> None:
         super().__init__(parent, fg_color=_BG, scrollbar_button_color=_BG2,
                          scrollbar_button_hover_color="#3d4870", **kwargs)
-        self._path = source_dir / "system_config.json"
+        self._path = configs_dir / "system_config.json"
         self._cfg = _load(self._path, {})
         self._vars: Dict[str, Any] = {}
         self._status = ctk.StringVar(value="")

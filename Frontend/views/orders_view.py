@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import customtkinter as ctk
 
-from modules.state.runtime_state import RuntimeState
+from utils.state import RuntimeState
 
 
 class OrdersView(ctk.CTkFrame):

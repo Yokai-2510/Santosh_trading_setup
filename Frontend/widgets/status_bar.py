@@ -8,7 +8,7 @@ from datetime import datetime
 
 import customtkinter as ctk
 
-from modules.state.runtime_state import RuntimeState
+from utils.state import RuntimeState
 
 _BAR_BG = "#13151f"
 _MUTED = "#6b7280"

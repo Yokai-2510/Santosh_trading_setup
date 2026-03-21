@@ -8,7 +8,7 @@ from pathlib import Path
 
 import customtkinter as ctk
 
-from modules.state.runtime_state import RuntimeState
+from utils.state import RuntimeState
 
 _BG = "#1e2130"
 _BG2 = "#252a3d"

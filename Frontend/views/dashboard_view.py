@@ -7,20 +7,21 @@ from __future__ import annotations
 import customtkinter as ctk
 
 from bridge.bot_bridge import BotBridge
-from modules.state.runtime_state import RuntimeState
+from theme import colors as C, fonts as F
+from utils.state import RuntimeState
 from widgets.position_card import PositionCard
 from widgets.signal_panel import SignalPanel
 from widgets.stat_card import StatCard
 
-# Dark palette
-_BG = "#1e2130"
-_BG2 = "#252a3d"
-_FG = "#e2e8f0"
-_GREEN = "#22c55e"
-_RED = "#ef4444"
-_AMBER = "#f59e0b"
-_MUTED = "#6b7280"
-_CARD_BG = "#252a3d"
+# Aliases for backward compat within this file
+_BG = C.BG_SECONDARY
+_BG2 = C.BG_CARD
+_FG = C.TEXT_PRIMARY
+_GREEN = C.GREEN
+_RED = C.RED
+_AMBER = C.AMBER
+_MUTED = C.TEXT_MUTED
+_CARD_BG = C.BG_CARD
 
 
 def _btn(parent, text, fg, hover, cmd, **kw):

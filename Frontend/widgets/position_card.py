@@ -8,7 +8,7 @@ from typing import Callable, Optional
 
 import customtkinter as ctk
 
-from modules.state.runtime_state import PositionSnapshot, WorkingOrderSnapshot
+from utils.state import PositionSnapshot, WorkingOrderSnapshot
 
 _BG2 = "#252a3d"
 _FG = "#c9d1e0"

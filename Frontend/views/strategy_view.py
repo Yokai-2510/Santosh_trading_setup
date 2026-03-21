@@ -21,9 +21,9 @@ _GREEN = "#22c55e"
 
 
 class StrategyView(ctk.CTkFrame):
-    def __init__(self, parent, source_dir: Path, **kwargs) -> None:
+    def __init__(self, parent, configs_dir: Path, **kwargs) -> None:
         super().__init__(parent, fg_color=_BG, **kwargs)
-        self._path = source_dir / "strategy_config.json"
+        self._path = configs_dir / "strategy_config.json"
         self._cfg = _load(self._path, {})
         self._status = ctk.StringVar(value="")
 
@@ -73,6 +73,26 @@ class StrategyView(ctk.CTkFrame):
         _num(frame, "ADX Period", "adx_period", adx.get("period", 14), self._entry_vars)
         _num(frame, "Min ADX Threshold", "adx_thr", adx.get("min_threshold", 20.0), self._entry_vars)
 
+        _section(frame, "VWAP")
+        vwap = entry.get("vwap", {})
+        _switch(frame, "Enable VWAP", "vwap_on", bool(vwap.get("enabled", False)), self._entry_vars)
+        _dropdown(frame, "VWAP Operator", "vwap_op", str(vwap.get("operator", ">")), [">", "<"], self._entry_vars)
+
+        _section(frame, "Supertrend")
+        st = entry.get("supertrend", {})
+        _switch(frame, "Enable Supertrend", "st_on", bool(st.get("enabled", False)), self._entry_vars)
+        _num(frame, "ST Period", "st_period", st.get("period", 10), self._entry_vars)
+        _num(frame, "ST Multiplier", "st_mult", st.get("multiplier", 3.0), self._entry_vars)
+        _dropdown(frame, "Required Direction", "st_dir", str(st.get("required_direction", 1)), ["1", "-1"], self._entry_vars)
+
+        _section(frame, "Bollinger Bands")
+        bb = entry.get("bollinger_bands", {})
+        _switch(frame, "Enable Bollinger Bands", "bb_on", bool(bb.get("enabled", False)), self._entry_vars)
+        _num(frame, "BB Period", "bb_period", bb.get("period", 20), self._entry_vars)
+        _num(frame, "BB Std Dev", "bb_std", bb.get("std_dev", 2.0), self._entry_vars)
+        _dropdown(frame, "BB Mode", "bb_mode", str(bb.get("mode", "above_middle")),
+                  ["above_middle", "below_middle", "near_lower", "near_upper"], self._entry_vars)
+
         _save_btn(frame, self._save_entry, self._status)
 
     def _save_entry(self) -> None:
@@ -91,6 +111,19 @@ class StrategyView(ctk.CTkFrame):
         e["adx"]["enabled"] = _bv(v, "adx_on")
         e["adx"]["period"] = _iv(v, "adx_period", 14)
         e["adx"]["min_threshold"] = _fv(v, "adx_thr", 20.0)
+        e.setdefault("vwap", {})
+        e["vwap"]["enabled"] = _bv(v, "vwap_on")
+        e["vwap"]["operator"] = _sv(v, "vwap_op")
+        e.setdefault("supertrend", {})
+        e["supertrend"]["enabled"] = _bv(v, "st_on")
+        e["supertrend"]["period"] = _iv(v, "st_period", 10)
+        e["supertrend"]["multiplier"] = _fv(v, "st_mult", 3.0)
+        e["supertrend"]["required_direction"] = _iv(v, "st_dir", 1)
+        e.setdefault("bollinger_bands", {})
+        e["bollinger_bands"]["enabled"] = _bv(v, "bb_on")
+        e["bollinger_bands"]["period"] = _iv(v, "bb_period", 20)
+        e["bollinger_bands"]["std_dev"] = _fv(v, "bb_std", 2.0)
+        e["bollinger_bands"]["mode"] = _sv(v, "bb_mode")
         _save(self._path, self._cfg)
         self._status.set("Entry config saved ✓")
 

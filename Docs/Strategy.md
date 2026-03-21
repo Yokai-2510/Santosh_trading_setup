@@ -80,6 +80,46 @@ pass = adx_value >= adx.min_threshold
 
 ---
 
+**Step 5 — VWAP** *(optional toggle)*
+
+```
+vwap = VWAP(high, low, close, volume)   // cumulative typical price * volume / volume
+pass = close > vwap                      // operator configurable: ">" or "<"
+```
+
+- Confirms price is above (bullish) or below (bearish) VWAP.
+- Only active when `vwap.enabled = true`.
+
+---
+
+**Step 6 — Supertrend** *(optional toggle)*
+
+```
+supertrend, direction = Supertrend(high, low, close, period=10, multiplier=3.0)
+pass = direction == required_direction   // 1=bullish, -1=bearish
+```
+
+- Trend-following indicator. Entry only when trend direction matches.
+- Only active when `supertrend.enabled = true`.
+
+---
+
+**Step 7 — Bollinger Bands** *(optional toggle)*
+
+```
+upper, middle, lower = BollingerBands(close, period=20, std_dev=2.0)
+mode: above_middle | below_middle | near_lower | near_upper
+```
+
+- Modes determine the check:
+  - `above_middle`: close > middle band (bullish)
+  - `below_middle`: close < middle band (bearish)
+  - `near_lower`: close within 20% of lower band (reversal setup)
+  - `near_upper`: close within 20% of upper band (reversal setup)
+- Only active when `bollinger_bands.enabled = true`.
+
+---
+
 **Signal result:** `ok = all(enabled checks pass)`
 If `ok = false`, log the failed check and skip the cycle. Do not place any order.
 
@@ -332,5 +372,5 @@ if all conditions met:
 
 ## 6. Configuration Reference
 
-All strategy behaviour is driven by `Backend/source/strategy_config.json`.
-See `Docs/Technical_Implementation.md` for the full schema definition.
+All strategy behaviour is driven by `Backend/configs/strategy_config.json`.
+See `docs/Technical_Implementation.md` for the full schema definition.

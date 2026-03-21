@@ -1,12 +1,32 @@
+# Credentials (never commit)
+Backend/configs/credentials.json
 Backend/source/credentials.json
+Backend/data_store/app_password.json
+
+# Token cache and data
+Backend/data_store/cache/access_token.json
+Backend/data_store/cache/master.json
+Backend/data_store/cache/master.json.gz
+Backend/data_store/cache/index_option_universe.json
 Backend/data/cache/access_token.json
 Backend/data/cache/master.json
 Backend/data/cache/master.json.gz
 Backend/data/cache/index_option_universe.json
+
+# Logs
+Backend/data_store/logs/
 Backend/data/logs/
+
+# Python
 __pycache__/
 *.pyc
+*.pyo
 .venv/
-__pycache__/
+
+# IDE
 .vscode/
-*.pyc
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store

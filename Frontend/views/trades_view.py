@@ -7,7 +7,7 @@ from __future__ import annotations
 import customtkinter as ctk
 
 from bridge.bot_bridge import BotBridge
-from modules.state.runtime_state import RuntimeState
+from utils.state import RuntimeState
 
 _BG = "#1e2130"
 _BG2 = "#252a3d"

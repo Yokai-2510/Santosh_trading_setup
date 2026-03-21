@@ -1,6 +1,4 @@
-"""
-filter_instruments — standalone helper to build current/next expiry option universe.
-"""
+"""filter_instruments — standalone helper for building option universe."""
 
 from __future__ import annotations
 
@@ -12,10 +10,10 @@ CURRENT_DIR = Path(__file__).resolve().parent
 if str(CURRENT_DIR) not in sys.path:
     sys.path.insert(0, str(CURRENT_DIR))
 
-from modules.auth.login_manager import authenticate_upstox
-from modules.data.instrument_filter import build_index_option_universe
-from modules.utils.config_loader import build_paths, load_all_configs
-from modules.utils.logger import setup_logger
+from data.instrument_filter import build_index_option_universe
+from utils.config_loader import build_paths, load_all_configs
+from utils.logger import setup_logger
+from utils.login_manager import authenticate_upstox
 
 
 def main() -> int:
@@ -45,7 +43,7 @@ def main() -> int:
         cache_dir=paths.cache_dir,
         expiry_choice=args.expiry,
         timeout_seconds=int(
-            cfg["system"].get("broker", {}).get("api", {}).get("master_contract_timeout_seconds", 60)
+            cfg["system"].get("broker", {}).get("api_timeouts", {}).get("master_contract_seconds", 60)
         ),
     )
     logger.info("Universe written with indices=%s", ",".join(sorted(universe.get("indices", {}).keys())))

@@ -1,1 +1,1 @@
-"""Santosh backend package."""
+"""Santosh trading bot — Backend package."""

@@ -8,7 +8,7 @@ from typing import Optional
 
 import customtkinter as ctk
 
-from modules.state.runtime_state import SignalSnapshot
+from utils.state import SignalSnapshot
 
 _BG2 = "#252a3d"
 _FG = "#c9d1e0"
@@ -21,10 +21,15 @@ _LABELS = {
     "rsi": "RSI",
     "volume_vs_ema": "Volume vs EMA",
     "adx": "ADX",
+    "vwap": "VWAP",
+    "supertrend": "Supertrend",
+    "bollinger_bands": "Bollinger Bands",
+    "macd": "MACD",
 }
 
 
 class SignalPanel(ctk.CTkFrame):
+    
     def __init__(self, parent, **kwargs) -> None:
         super().__init__(parent, corner_radius=10, fg_color=_BG2, **kwargs)
 
